@@ -1,0 +1,246 @@
+### go run . -bench -seed 7
+
+All messages (wakeups and announcement included).
+clock periods in [10, 20], link delays in [0, 10]: u = 30, m = 10, s = ceil(u/m) = 3
+names 1..n; random = average over 10 random rings; asc / desc = sorted along the ring.
+CR = Chang-Roberts, P = Peterson, V = Vitanyi with f = 2^i, V2s = Vitanyi with f = (2s)^i.
+
+     n  layout        CR         P        V      V2s   CR/n    P/n    V/n  V2s/n   bound(2)   V time/u
+     8  random        30        48       33       31   3.70   6.00   4.12   3.92         80       14.3
+     8     asc        23        32       31       31   2.88   4.00   3.88   3.88         85       14.3
+     8    desc        44        32       31       31   5.50   4.00   3.88   3.88         81       14.4
+    16  random        69       122       68       64   4.31   7.60   4.28   3.99        170       29.5
+    16     asc        47        64       63       63   2.94   4.00   3.94   3.94        176       32.3
+    16    desc       152        64       63       63   9.50   4.00   3.94   3.94        176       30.3
+    32  random       163       262      141      129   5.09   8.20   4.39   4.03        352       57.5
+    32     asc        95       128      127      127   2.97   4.00   3.97   3.97        352       56.8
+    32    desc       560       128      127      127  17.50   4.00   3.97   3.97        352       57.6
+    64  random       360       627      288      260   5.62   9.80   4.50   4.07        704      115.2
+    64     asc       191       256      255      255   2.98   4.00   3.98   3.98        704      120.3
+    64    desc      2144       256      255      255  33.50   4.00   3.98   3.98        704      111.5
+   128  random       808      1434      566      528   6.32  11.20   4.42   4.12       1408      230.0
+   128     asc       383       512      511      511   2.99   4.00   3.99   3.99       1408      230.7
+   128    desc      8384       512      511      511  65.50   4.00   3.99   3.99       1408      228.6
+   256  random      1785      3072     1150     1052   6.97  12.00   4.49   4.11       2816      466.3
+   256     asc       767      1024     1024     1023   3.00   4.00   4.00   4.00       2816      474.4
+   256    desc     33152      1024     1023     1023 129.50   4.00   4.00   4.00       2816      464.9
+   512  random      3954      6963     2308     2104   7.72  13.60   4.51   4.11       5632      923.4
+   512     asc      1535      2048     2047     2047   3.00   4.00   4.00   4.00       5632      925.3
+   512    desc    131840      2048     2047     2047 257.50   4.00   4.00   4.00       5632      941.7
+  1024  random      8406     14950     4617     4227   8.21  14.60   4.51   4.13      11264     1852.3
+  1024     asc      3071      4096     4096     4095   3.00   4.00   4.00   4.00      11264     1867.4
+  1024    desc    525824      4096     4095     4095 513.50   4.00   4.00   4.00      11264     1828.2
+  2048  random     18648     33587     9178     8375   9.11  16.40   4.48   4.09      22528     3701.3
+  2048     asc      6143      8192     8191     8191   3.00   4.00   4.00   4.00      22528     3740.7
+  2048    desc   2100224      8192     8191     8191 1025.50   4.00   4.00   4.00      22528     3698.0
+
+### go run . -table -trials 20 -seed 7
+
+Synchronous model: tick = 1, link = 1 time unit, all wake up at t = 0; names 1..n.
+avg = average over 20 random rings; worst = largest of the random rings and the rings with names
+ascending / descending along the ring. All messages counted (wakeups and announcement included).
+Time = time units until the last processor knows the leader (= ticks).
+
+     n | algorithm            |  messages |   msgs/n |    worst/n |   bits/n |      time | worst time
+     8 | Chang-Roberts        |        30 |     3.81 |       5.50 |     9.93 |        16 |         16
+     8 | Peterson             |        48 |     6.00 |       6.00 |    15.34 |        24 |         26
+     8 | Vitanyi f=i^2        |        32 |     4.01 |       4.25 |     5.04 |        24 |         24
+     8 | Vitanyi f=2^i        |        33 |     4.12 |       4.38 |     5.19 |        31 |         31
+     8 | Vitanyi f=(2*2)^i    |        31 |     3.91 |       4.00 |     4.91 |        45 |         45
+    16 | Chang-Roberts        |        70 |     4.38 |       9.50 |    15.12 |        32 |         32
+    16 | Peterson             |       118 |     7.40 |       8.00 |    25.08 |        51 |         58
+    16 | Vitanyi f=i^2        |        66 |     4.12 |       4.38 |     5.82 |        48 |         48
+    16 | Vitanyi f=2^i        |        68 |     4.25 |       4.56 |     6.01 |        63 |         63
+    16 | Vitanyi f=(2*2)^i    |        65 |     4.04 |       4.19 |     5.68 |        93 |         93
+    32 | Chang-Roberts        |       165 |     5.17 |      17.50 |    22.38 |        64 |         64
+    32 | Peterson             |       259 |     8.10 |      10.00 |    34.50 |        97 |        123
+    32 | Vitanyi f=i^2        |       137 |     4.27 |       4.50 |     6.79 |        96 |         96
+    32 | Vitanyi f=2^i        |       144 |     4.50 |       4.75 |     7.08 |       127 |        127
+    32 | Vitanyi f=(2*2)^i    |       131 |     4.10 |       4.22 |     6.49 |       189 |        189
+    64 | Chang-Roberts        |       353 |     5.52 |      33.50 |    28.95 |       128 |        128
+    64 | Peterson             |       634 |     9.90 |      10.00 |    51.62 |       205 |        228
+    64 | Vitanyi f=i^2        |       277 |     4.32 |       4.52 |     7.72 |       192 |        192
+    64 | Vitanyi f=2^i        |       285 |     4.45 |       4.95 |     7.90 |       255 |        255
+    64 | Vitanyi f=(2*2)^i    |       266 |     4.15 |       4.30 |     7.40 |       381 |        381
+   128 | Chang-Roberts        |       809 |     6.32 |      65.50 |    39.19 |       256 |        256
+   128 | Peterson             |      1331 |    10.40 |      12.00 |    63.92 |       370 |        478
+   128 | Vitanyi f=i^2        |       554 |     4.33 |       4.49 |     8.69 |       384 |        384
+   128 | Vitanyi f=2^i        |       588 |     4.59 |       4.95 |     9.00 |       511 |        511
+   128 | Vitanyi f=(2*2)^i    |       533 |     4.17 |       4.26 |     8.32 |       765 |        765
+   256 | Chang-Roberts        |      1782 |     6.96 |     129.50 |    49.99 |       512 |        512
+   256 | Peterson             |      3098 |    12.10 |      14.00 |    86.70 |       805 |        982
+   256 | Vitanyi f=i^2        |      1140 |     4.45 |       4.68 |     9.83 |       768 |        768
+   256 | Vitanyi f=2^i        |      1158 |     4.52 |       4.80 |     9.83 |      1023 |       1023
+   256 | Vitanyi f=(2*2)^i    |      1067 |     4.17 |       4.31 |     9.28 |      1533 |       1533
+   512 | Chang-Roberts        |      3861 |     7.54 |     257.50 |    61.43 |      1024 |       1024
+   512 | Peterson             |      6810 |    13.30 |      14.00 |   108.13 |      1597 |       1866
+   512 | Vitanyi f=i^2        |      2296 |     4.48 |       4.68 |    10.89 |      1536 |       1536
+   512 | Vitanyi f=2^i        |      2319 |     4.53 |       4.79 |    10.85 |      2047 |       2047
+   512 | Vitanyi f=(2*2)^i    |      2147 |     4.19 |       4.34 |    10.27 |      3069 |       3069
+  1024 | Chang-Roberts        |      8946 |     8.74 |     513.50 |    79.96 |      2048 |       2048
+  1024 | Peterson             |     14848 |    14.50 |      16.00 |   132.23 |      3175 |       4027
+  1024 | Vitanyi f=i^2        |      4577 |     4.47 |       4.69 |    11.84 |      3072 |       3072
+  1024 | Vitanyi f=2^i        |      4671 |     4.56 |       5.01 |    11.86 |      4095 |       4095
+  1024 | Vitanyi f=(2*2)^i    |      4289 |     4.19 |       4.31 |    11.26 |      6141 |       6141
+  2048 | Chang-Roberts        |     19237 |     9.39 |    1025.50 |    95.21 |      4096 |       4096
+  2048 | Peterson             |     32358 |    15.80 |      16.00 |   159.69 |      6447 |       7248
+  2048 | Vitanyi f=i^2        |      9162 |     4.47 |       4.65 |    12.84 |      6144 |       6144
+  2048 | Vitanyi f=2^i        |      9342 |     4.56 |       4.93 |    12.86 |      8191 |       8191
+  2048 | Vitanyi f=(2*2)^i    |      8633 |     4.22 |       4.31 |    12.27 |     12285 |      12285
+
+### go run . -check -seed 1
+
+seed 1
+
+== 1. Section 3, bound (2), f(i) = 2^i
+claim: messages <= 2N + N (u/m) (f(l)+1) sum_i 1/f(i)  <=  2N + 3N u/m  (linear in N)
+worst of 9 rings (3 layouts x 3 wake-up modes) per row; u/m is the realised ratio of that run
+ timing     n     msgs/N      (2)/N     2+3u/m    msgs / (2) msgs/(2N+3Nu/m)
+   s<=1     8       4.12       4.99       5.00         0.827           0.825
+   s<=1    64       4.52       5.00       5.00         0.903           0.903
+   s<=1   512       4.60       5.00       5.00         0.921           0.921
+   s<=1  2048       4.65       5.00       5.00         0.930           0.930
+   s<=3     8       3.88       9.22       9.25         0.420           0.419
+   s<=3    64       4.22      11.00      11.00         0.384           0.384
+   s<=3   512       4.79      11.00      11.00         0.436           0.436
+   s<=3  2048       4.80      11.00      11.00         0.436           0.436
+  s<=30     8       4.38      22.78      22.86         0.192           0.191
+  s<=30    64       4.91      76.50      76.50         0.064           0.064
+  s<=30   512       4.56      92.00      92.00         0.050           0.050
+  s<=30  2048       4.82      92.00      92.00         0.052           0.052
+ s<=300     8       4.12      65.61      65.86         0.063           0.063
+ s<=300    64       4.81     450.50     450.50         0.011           0.011
+ s<=300   512       5.47     902.00     902.00         0.006           0.006
+ s<=300  2048       4.95     902.00     902.00         0.005           0.005
+verdict: OK, largest messages/bound = 0.930 for (2) and 0.930 for 2N+3Nu/m
+
+== 2. Section 4, bound (4), f(i) = (2s)^i with s = ceil(u/m) known to the processors
+claim: messages <= 3N + N(1 + 1/f(l)) < 5N, independent of u/m
+ timing     n        s   max msgs/N f=2^i msgs/N
+   s<=1     8        1        4.250        4.250
+   s<=1   512        1        4.809        4.809
+   s<=1  2048        1        4.509        4.509
+   s<=3     8        3        4.000        4.125
+   s<=3   512        3        4.176        4.582
+   s<=3  2048        3        4.187        4.684
+  s<=30     8       30        3.875        4.625
+  s<=30   512       30        4.006        4.916
+  s<=30  2048       30        4.012        4.854
+ s<=300     8      300        3.875        5.000
+ s<=300   512      300        3.998        4.861
+ s<=300  2048      300        4.001        4.932
+verdict: OK, at most 4.809 N messages
+
+== 3. Section 3, bound (3) on bits, and Section 4: 2N + 3N log l bits for f(i) = (2u/m)^i
+claim (3): bits <= 2N + N (u/m) (f(l)+1) sum_i |i|/f(i), |i| = length of the name i in dyadic code
+Figure = protocol as drawn (timer := 1 on waking up: every processor sends its own name once);
+origin = M_i waits f(i) units also at its origin (timer := f(i)), as the prose of Section 3 can be read
+f(i) = 2^i, names 1..N in random order, l = 1
+ timing     n  Figure bits/N  origin bits/N      (3)/N      sum_i |i| / N
+   s<=1    64           7.62           3.47       5.80               4.22
+   s<=1   512          10.70           3.66       5.80               7.04
+   s<=1  4096          13.91           3.90       5.80              10.01
+   s<=3    64           7.72           3.56      13.39               4.22
+   s<=3   512          10.54           3.51      13.39               7.04
+   s<=3  4096          13.89           3.90      13.39              10.01
+
+claim (4'): with f = (2s)^i, bits <= 2N + 3N log l   (origin variant, timing s<=3, n = 512)
+    l     bits/N    2+3*log2(l)     2+3*|l| (dyadic)
+    1       3.18           2.00                 5.00
+    2       3.19           5.00                 5.00
+    5       4.28           8.97                 8.00
+   12       6.01          12.75                11.00
+verdict: DIFFERS, the protocol as drawn exceeds (3) (up to 2.40 x the bound): every name is sent at least once,
+         so for names 1..N at least sum |i| ~ N log N bits; analysis (1) misses this '+1 pass' per message.
+         With M_i waiting also at its origin (3) holds (largest ratio 0.673). 2N + 3N log l fails in 1 of 4 rows
+         with log2 (l = 1 would allow 2N bits, M_1 alone needs N, wakeups N, sleepwell N) and in 0 with the dyadic length
+
+== 4. Section 4, running time for f(i) = 2^i
+claim: time <= N u (2^l + 2)   (the text says "Nu(2l+2)"; with 2l+2 it would be wrong, see the last column)
+ timing     n    l      time/(Nu)        2^l + 2         2l + 2
+   s<=3   256    1           2.09              4              4
+   s<=3   256    2           2.89              6              6
+   s<=3   256    4           9.13             18             10
+   s<=3   256    8         127.22            258             18
+   s<=3   256   12        2097.01           4098             26
+  s<=30   256    1           1.51              4              4
+  s<=30   256    2           1.64              6              6
+  s<=30   256    4           3.89             18             10
+  s<=30   256    8          47.53            258             18
+  s<=30   256   12         791.05           4098             26
+verdict: OK, time / (N u (2^l+2)) <= 0.524; the literal 2l+2 is exceeded in 4 of 10 rows
+
+== 5. Section 4, worst case under adversary scheduling, f(i) = 2^i fixed
+claim: names ascending clockwise, unit delay of i = 2^(N-i+1): no overtaking, N(N+2)/2 message passes
+   N     M msgs   N(N+1)/2   N(N+2)/2   all incl. 2N
+   4         10         10         12             18
+   8         36         36         40             52
+  16        136        136        144            168
+  24        300        300        312            348
+  32        528        528        544            592
+verdict: OK, quadratic as claimed; the exact count is N(N+1)/2 election messages (M_1: N passes, M_i: N-i+1),
+         N(N+2)/2 in the paper is N/2 more
+
+== 6. Section 4 and the CWI Table: dependence on the smallest name l
+claim: f = i^a (a > 1): O(N u l/m) messages; f = 2^i: O(N u/m), independent of l; f = (2u/m)^i: Theta(N)
+timing s<=3, n = 512, names l..l+511, worst of 3 layouts
+n/a: f(l) is above the simulator's cap 2^40, where all messages would travel equally fast (not the paper's f)
+    l   i^2 msgs/N   i^2: (2)/N     2^i msgs/N  (2s)^i msgs/N
+    1         4.52         11.9           4.73           4.13
+    4         5.11         16.4           4.66           4.11
+    8         5.66         27.6           4.44           4.10
+   12         6.03         39.0           4.35           4.18
+   64         8.99        174.2            n/a            n/a
+  256        31.87        515.3            n/a            n/a
+verdict: OK, for i^2 the messages grow with l (x7.1 from l=1 to l=256) and stay below (2), which grows linearly in l;
+         for 2^i (4.35..4.73) and (2s)^i (4.10..4.18) they do not depend on l
+
+== 7. CWI Table, f = constant (no use of time): O(N^2) worst case, as Le Lann / Chang-Roberts
+     n     asc msgs/N  random msgs/N 2^i asc msgs/N
+    64          19.14           6.05           3.98
+   256          67.30           8.53           4.00
+  1024         259.00           9.37           4.00
+(synchronous ring s = 1, names ascending clockwise: the worst layout when the minimum wins)
+verdict: OK, with f = 1, quadrupling n multiplies messages/N by 3.85: quadratic
+
+== 8. Section 4, average case (5), and the asynchronous algorithms it is compared with
+claim: f = 2^i, l = 1: O(N) on average; Chang-Roberts: N H_N election messages on average [CR];
+       Peterson / DKR: at most 2N log N + N election messages; the asynchronous lower bound is Omega(N log N)
+     n     V msgs/N   CR elect/N     CR / (N H_N)      P elect/N P / (2N log N + N)
+    64         4.52         4.68            0.986           8.90              0.692
+   256         4.55         6.11            0.997          11.20              0.765
+  1024         4.56         7.53            1.003          13.40              0.714
+  4096         4.63         8.48            0.954          17.00              0.680
+verdict: OK, Vitanyi stays at about 4.6 messages per processor while Chang-Roberts grows like H_N
+
+== 9. Section 4, minimal time variant f(i, j) = floor(2^(j-i))
+claim: time about 3 walk times (wakeup, M_l, sleepwell each circle once), whatever l is;
+       but O(N^2) messages in the worst case and O(N log N) on average ("a reversion to [CR]")
+     n     l       time/(3Nu)  2^i: time/(3Nu)     asc msgs/N  random msgs/N
+    64     1            0.298            0.605          34.50           7.19
+    64    10            0.259          170.418          34.50           6.27
+   256     1            0.270            0.600         130.50           7.26
+   256    10            0.278          172.328         130.50           7.49
+  1024     1            0.268            0.611         514.50           9.81
+  1024    10            0.268          170.879         514.50           9.01
+verdict: OK, time <= 0.369 * 3Nu for every l, ascending ring quadratic (x3.94 per x4 in n)
+
+== 10. Bounds proved in this work (they count the first hop of every message and the wake-up delay)
+claim M: messages <= 4N - 1 + N (u/m) (f(l)+2) sum_{i != l} 1/f(i);  f = 2^i: < 4N + 2N u/m;  f = (2s)^i: < 6N
+claim T: time from the first wake-up <= (N-1) dmax + N (f(l)+1) u + N u  <  N u (f(l)+3)
+ timing        f   runs   max msgs/(M)   max time/(T)
+   s<=1      2^i     36          0.873          0.800
+   s<=1  (2*1)^i     36          0.848          0.800
+   s<=1      i^2     36          0.739          0.818
+   s<=3      2^i     36          0.602          0.524
+   s<=3  (2*3)^i     36          0.903          0.512
+   s<=3      i^2     36          0.511          0.497
+  s<=30      2^i     36          0.202          0.340
+  s<=30 (2*30)^i     36          0.951          0.224
+  s<=30      i^2     36          0.208          0.423
+ s<=300      2^i     36          0.104          0.329
+ s<=300 (2*300)^i     36          0.993          0.110
+ s<=300      i^2     36          0.179          0.359
+verdict: OK, largest ratios 0.993 (messages) and 0.818 (time)
+
+1 claim(s) differ from the measurements, see above
